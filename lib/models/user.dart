@@ -18,6 +18,9 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    // Handle both 'avatar' and 'profileImage' field names from API
+    final avatar = json['avatar'] ?? json['profileImage'];
+
     return User(
       id: json['id'],
       username: json['username'],
@@ -25,7 +28,7 @@ class User {
       role: json['role'] ?? 'customer',
       phone: json['phone'],
       address: json['address'],
-      avatar: json['avatar'],
+      avatar: avatar,
     );
   }
 

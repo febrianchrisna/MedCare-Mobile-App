@@ -34,16 +34,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      final success = await authProvider.register(
-        _usernameController.text.trim(),
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
+      try {
+        final success = await authProvider.register(
+          _usernameController.text.trim(),
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
 
-      if (success) {
-        if (mounted) {
+        if (!mounted) return;
+
+        if (success) {
           Fluttertoast.showToast(
-            msg: "Registration successful! Please login",
+            msg: "Registration successful! Please login with your new account",
             toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.BOTTOM,
             backgroundColor: AppTheme.successColor,
@@ -54,9 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             context,
             MaterialPageRoute(builder: (_) => const LoginScreen()),
           );
-        }
-      } else if (authProvider.error != null) {
-        if (mounted) {
+        } else if (authProvider.error != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(authProvider.error!),
@@ -64,6 +64,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           );
         }
+      } catch (e) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error during registration: $e"),
+            backgroundColor: AppTheme.dangerColor,
+          ),
+        );
       }
     }
   }

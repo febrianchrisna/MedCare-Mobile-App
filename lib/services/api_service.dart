@@ -226,6 +226,7 @@ class ApiService {
     String password,
   ) async {
     try {
+      print("API Service: Registration attempt for $email");
       final response = await http.post(
         Uri.parse(ApiConstants.register),
         headers: {'Content-Type': 'application/json'},
@@ -236,13 +237,36 @@ class ApiService {
         }),
       );
 
-      if (response.statusCode == 201) {
-        return json.decode(response.body);
+      print("Registration response status: ${response.statusCode}");
+      print("Registration response body: ${response.body}");
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+
+        // Check if response has nested data structure
+        final userData = responseData['data'] ?? responseData;
+
+        // Determine which field contains the token
+        String? token =
+            userData['accessToken'] ??
+            userData['token'] ??
+            responseData['accessToken'] ??
+            responseData['token'];
+
+        if (token == null) {
+          print("No token found in registration response");
+        } else {
+          print("Token found in registration response");
+        }
+
+        return {'token': token, 'user': userData, 'success': true};
       } else {
         final error = json.decode(response.body);
+        print("Registration failed: ${error['message'] ?? 'Unknown error'}");
         throw Exception(error['message'] ?? 'Registration failed');
       }
     } catch (e) {
+      print("Error during registration API call: $e");
       throw Exception('Error during registration: $e');
     }
   }
@@ -648,6 +672,59 @@ class ApiService {
     } catch (e) {
       print("Error getting current user: $e");
       return null;
+    }
+  }
+
+  // Update user profile
+  Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> data) async {
+    try {
+      final token = await _getToken();
+      if (token == null) {
+        throw Exception('Please log in to update your profile');
+      }
+
+      // Convert 'avatar' field to 'profileImage' as expected by the API
+      final Map<String, dynamic> apiData = Map.from(data);
+      if (apiData.containsKey('avatar')) {
+        apiData['profileImage'] = apiData['avatar'];
+        apiData.remove('avatar');
+      }
+
+      print("Attempting to update profile with data: $apiData");
+      final response = await http.put(
+        Uri.parse(ApiConstants.updateProfile),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+        body: json.encode(apiData),
+      );
+
+      print("Profile update response status: ${response.statusCode}");
+      print("Profile update response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        // For nested response data structure
+        final updatedUserData = responseData['data'] ?? responseData;
+
+        // Save updated user data to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+          ApiConstants.userKey,
+          json.encode(updatedUserData),
+        );
+        print("Updated user data saved to SharedPreferences");
+
+        return updatedUserData;
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['message'] ?? 'Failed to update profile');
+      }
+    } catch (e) {
+      print('Error during profile update: $e');
+      throw Exception('Error updating profile: $e');
     }
   }
 }

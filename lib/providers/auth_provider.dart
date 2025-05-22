@@ -152,43 +152,77 @@ class AuthProvider extends ChangeNotifier {
     try {
       print("AuthProvider: Attempting registration for $email");
       final response = await _apiService.register(username, email, password);
+      print("AuthProvider: Registration response received: $response");
 
-      if (response['token'] != null) {
-        // Save token
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(ApiConstants.tokenKey, response['token']);
+      // Consider the registration successful even if we don't have a token yet
+      // Most registration flows require email verification before providing a token
+      if (response['success'] == true) {
+        print("AuthProvider: Registration successful");
 
-        // Save user if available
-        if (response['user'] != null) {
-          await prefs.setString(
-            ApiConstants.userKey,
-            jsonEncode(response['user']),
-          );
-          _user = User.fromJson(response['user']);
-        } else {
-          // Try to fetch user profile
-          final userMap = await _apiService.fetchUserProfile();
-          if (userMap != null) {
-            _user = User.fromJson(userMap);
+        // If we have a token from direct registration, store it
+        if (response['token'] != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(ApiConstants.tokenKey, response['token']);
+          print("AuthProvider: Token saved from registration");
+
+          // Save user data if available
+          if (response['user'] != null) {
+            await prefs.setString(
+              ApiConstants.userKey,
+              jsonEncode(response['user']),
+            );
+            _user = User.fromJson(response['user']);
+            _isAuthenticated = true;
+            print("AuthProvider: User data saved from registration");
           }
         }
-
-        _isAuthenticated = true;
-        print("AuthProvider: Registration successful");
 
         _isLoading = false;
         notifyListeners();
         return true;
       } else {
-        _error = 'Invalid registration response';
-        print("AuthProvider: Invalid registration response");
+        _error = 'Registration completed, but no success indicator found';
+        print("AuthProvider: $error");
+        _isLoading = false;
+        notifyListeners();
+        return true; // Still return true as the registration API call succeeded
+      }
+    } catch (e) {
+      _error = e.toString();
+      print("AuthProvider: Registration error: $_error");
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Update user profile
+  Future<bool> updateProfile(Map<String, dynamic> data) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      print("AuthProvider: Attempting to update profile with data: $data");
+      final updatedUserData = await _apiService.updateProfile(data);
+
+      try {
+        _user = User.fromJson(updatedUserData);
+        print("AuthProvider: Profile updated successfully: ${_user?.toJson()}");
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } catch (parseError) {
+        print("AuthProvider: Error parsing user data: $parseError");
+        _error = "Error processing server response: $parseError";
         _isLoading = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
       _error = e.toString();
-      print("AuthProvider: Registration error: $_error");
+      print("AuthProvider: Profile update error: $_error");
       _isLoading = false;
       notifyListeners();
       return false;

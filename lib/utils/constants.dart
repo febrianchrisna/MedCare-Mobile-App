@@ -13,6 +13,7 @@ class ApiConstants {
   static const String tokenKey = 'auth_token';
   static const String userKey = 'user_data';
   static const String userProfile = '$baseUrl/users/me';
+  static const String updateProfile = '$baseUrl/profile'; // Add this line
 
   // Medicines
   static const String medicines = '$baseUrl/medicines';
@@ -31,3 +32,7 @@ class ApiConstants {
 // Default medicine image for fallback
 const String defaultMedicineImage =
     'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60';
+
+// Default profile image for fallback
+const String defaultProfileImage =
+    'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';

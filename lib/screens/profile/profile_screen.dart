@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:medcareapp/providers/auth_provider.dart';
 import 'package:medcareapp/screens/auth/login_screen.dart';
-import 'package:medcareapp/screens/orders/orders_screen.dart'; // Add this import at the top
+import 'package:medcareapp/screens/orders/orders_screen.dart';
 import 'package:medcareapp/utils/theme.dart';
+import 'package:medcareapp/utils/constants.dart';
+import 'package:medcareapp/screens/profile/edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -76,6 +78,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
 
+    // Get avatar URL or use default
+    final avatarUrl =
+        user?.avatar != null && user!.avatar!.isNotEmpty
+            ? user.avatar!
+            : defaultProfileImage;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -124,19 +132,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
+                    // Avatar with network image
                     CircleAvatar(
                       radius: 40,
-                      backgroundColor: AppTheme.primaryColor,
-                      child: Text(
-                        (user?.username != null && user!.username!.isNotEmpty)
-                            ? user!.username![0].toUpperCase()
-                            : '?',
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: NetworkImage(avatarUrl),
+                      onBackgroundImageError:
+                          (_, __) => Icon(
+                            Icons.person,
+                            size: 40,
+                            color: AppTheme.primaryColor,
+                          ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -180,6 +186,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                     ),
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () async {
+                        // Navigate to edit profile screen
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => EditProfileScreen(user: user!),
+                          ),
+                        );
+
+                        // If profile was updated, reload user data
+                        if (result == true) {
+                          if (mounted) {
+                            Provider.of<AuthProvider>(
+                              context,
+                              listen: false,
+                            ).loadUserData();
+                          }
+                        }
+                      },
+                      tooltip: 'Edit Profile',
+                    ),
                   ],
                 ),
               ),
@@ -200,12 +229,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               context,
               icon: Icons.person_outline,
               title: 'Personal Information',
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Coming soon: Personal Information'),
+              onTap: () async {
+                // Navigate to edit profile screen
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EditProfileScreen(user: user!),
                   ),
                 );
+
+                // If profile was updated, reload user data
+                if (result == true) {
+                  if (mounted) {
+                    Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    ).loadUserData();
+                  }
+                }
               },
             ),
             _buildSettingsTile(
