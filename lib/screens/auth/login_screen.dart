@@ -206,30 +206,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 24),
-
-                  // Demo Login Info
-                  if (!authProvider.isLoading)
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Demo Credentials:',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          Text('Email: admin@example.com'),
-                          Text('Password: admin123'),
-                        ],
-                      ),
-                    ),
                 ],
               ),
             ),
