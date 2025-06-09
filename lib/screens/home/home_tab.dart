@@ -91,14 +91,6 @@ class _HomeTabState extends State<HomeTab> {
               floating: false,
               pinned: true,
               title: const Text('MedCare'),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    // Navigate to search screen or show search dialog
-                  },
-                ),
-              ],
             ),
 
             // Content

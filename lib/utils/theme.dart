@@ -16,11 +16,11 @@ class AppTheme {
   // Light Theme
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: primaryColor,
       secondary: accentColor,
       error: dangerColor,
-      background: bgColor,
+      surface: bgColor, // using surface instead of background (deprecated)
     ),
     scaffoldBackgroundColor: bgColor,
     appBarTheme: AppBarTheme(
@@ -53,10 +53,9 @@ class AppTheme {
       bodyLarge: GoogleFonts.poppins(color: textColor, fontSize: 16),
       bodyMedium: GoogleFonts.poppins(color: textColor, fontSize: 14),
     ),
-    cardTheme: CardTheme(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ),
+    // Replace the CardTheme with direct card properties
+    // Remove cardTheme as it's causing type issues
+    cardColor: Colors.white,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,

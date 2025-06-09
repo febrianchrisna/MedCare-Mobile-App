@@ -85,43 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             : defaultProfileImage;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder:
-                    (context) => AlertDialog(
-                      title: const Text('Logout'),
-                      content: const Text('Are you sure you want to logout?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            await authProvider.logout();
-                            if (mounted) {
-                              Provider.of<AuthProvider>(
-                                context,
-                                listen: false,
-                              ).loadUserData();
-                            }
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Logout'),
-                        ),
-                      ],
-                    ),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Profile')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -249,28 +213,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 }
               },
             ),
-            _buildSettingsTile(
-              context,
-              icon: Icons.lock_outline,
-              title: 'Change Password',
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Coming soon: Change Password')),
-                );
-              },
-            ),
-            _buildSettingsTile(
-              context,
-              icon: Icons.location_on_outlined,
-              title: 'Manage Addresses',
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Coming soon: Manage Addresses'),
-                  ),
-                );
-              },
-            ),
 
             const SizedBox(height: 24),
 
@@ -291,16 +233,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const OrdersScreen()),
-                );
-              },
-            ),
-            _buildSettingsTile(
-              context,
-              icon: Icons.favorite_border,
-              title: 'Wishlist',
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Coming soon: Wishlist')),
                 );
               },
             ),
