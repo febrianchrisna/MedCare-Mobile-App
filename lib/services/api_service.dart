@@ -350,26 +350,6 @@ class ApiService {
     }
   }
 
-  // Get order by ID (user & admin) - Remove this method, as it's duplicated
-  // Future<Order> getOrderById(int id) async {
-  //   try {
-  //     final token = await _getToken();
-  //     final url = '${ApiConstants.baseUrl}/orders/$id';
-  //     final headers = {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Bearer $token',
-  //     };
-  //     final response = await http.get(Uri.parse(url), headers: headers);
-  //     if (response.statusCode == 200) {
-  //       return Order.fromJson(json.decode(response.body));
-  //     } else {
-  //       throw Exception('Failed to load order: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     throw Exception('Error getting order: $e');
-  //   }
-  // }
-
   // Create order (user only)
   Future<Order> createOrder(Order order) async {
     try {
