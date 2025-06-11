@@ -1,6 +1,7 @@
 # medcareapp
 
-A new Flutter project.
+1. Nurma Intan Harianja (123220046)
+2. Febrian Chrisna Ardianto (123220051)
 
 ## Getting Started
 
